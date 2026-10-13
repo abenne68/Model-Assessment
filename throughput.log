@@ -1,0 +1,20 @@
+Ultralytics 8.4.164  Python-3.12.14 torch-2.14.0+cpu CPU (AMD Ryzen 7 170 with Radeon Graphics)
+YOLOv5n summary (fused): 84 layers, 2,503,139 parameters, 0 gradients, 1.8 GFLOPs
+
+[34m[1mPyTorch:[0m starting from 'C:\Users\austi\OneDrive - University of North Carolina at Charlotte\Desktop\Senior Design 1\Model assessment\runs\yolov5nu\weights\best.pt' with input shape (1, 3, 320, 320) BCHW and output shape(s) (1, 5, 2100) (5.0 MB)
+
+[34m[1mONNX:[0m starting export with onnx 1.23.0 opset 18...
+[34m[1mONNX:[0m slimming with onnxslim 0.1.96...
+[34m[1mONNX:[0m export success  4.9s, saved as 'C:\Users\austi\OneDrive - University of North Carolina at Charlotte\Desktop\Senior Design 1\Model assessment\runs\yolov5nu\weights\best.onnx' (10.0 MB)
+
+Export complete (5.1s)
+Results saved to [1mC:\Users\austi\OneDrive - University of North Carolina at Charlotte\Desktop\Senior Design 1\Model assessment\runs\yolov5nu\weights\best.onnx[0m
+Predict:         yolo predict task=detect model=C:\Users\austi\OneDrive - University of North Carolina at Charlotte\Desktop\Senior Design 1\Model assessment\runs\yolov5nu\weights\best.onnx imgsz=320 
+Validate:        yolo val task=detect model=C:\Users\austi\OneDrive - University of North Carolina at Charlotte\Desktop\Senior Design 1\Model assessment\runs\yolov5nu\weights\best.onnx imgsz=320 data=C:\Users\austi\OneDrive - University of North Carolina at Charlotte\Desktop\Senior Design 1\Model assessment\datasets\bottle-split\data.yaml  
+Visualize:       https://netron.app
+YOLO26n {'max_throughput_ips': 128.8, 'best_batch': 4, 'b1_inference_fps': 108.3, 'e2e_fps_b1': 81.0, 'per_batch_ips': {1: 108.33701508574629, 2: 120.30432201246016, 4: 128.8472805410347, 8: 118.84648493115765, 16: 84.36639828290761, 32: 90.23842755086095}, 'onnx_mb': 10.3}
+YOLOv10n {'max_throughput_ips': 98.7, 'best_batch': 2, 'b1_inference_fps': 83.8, 'e2e_fps_b1': 74.9, 'per_batch_ips': {1: 83.8237856390426, 2: 98.71110959830088, 4: 96.57449278548815, 8: 97.8968166089603, 16: 76.73011175870636, 32: 71.16458822345801}, 'onnx_mb': 9.7}
+YOLO11n {'max_throughput_ips': 97.7, 'best_batch': 2, 'b1_inference_fps': 90.1, 'e2e_fps_b1': 69.3, 'per_batch_ips': {1: 90.09917398282626, 2: 97.7014561032288, 4: 89.85634665919461, 8: 86.18567729638633, 16: 80.13642845361473, 32: 70.9333381535676}, 'onnx_mb': 11.0}
+YOLOv5nu {'max_throughput_ips': 114.7, 'best_batch': 4, 'b1_inference_fps': 101.2, 'e2e_fps_b1': 84.1, 'per_batch_ips': {1: 101.16807409398265, 2: 102.57978703212159, 4: 114.68828584205073, 8: 114.16300311710674, 16: 105.66924552522146, 32: 97.50127894129993}, 'onnx_mb': 10.4}
+D-FINE-N {'max_throughput_ips': 40.0, 'best_batch': 4, 'b1_inference_fps': 26.7, 'e2e_fps_b1': 25.7, 'per_batch_ips': {1: 26.689816465636877, 2: 38.95751780043285, 4: 39.97924177836696, 8: 31.633714798108553, 16: 31.337048291477803, 32: 28.996158869679057}, 'onnx_mb': 15.4}
+Classical OpenCV 212.1

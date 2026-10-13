@@ -1,0 +1,20 @@
+# Secrets: never commit
+.env
+
+# Large data: everything in datasets/ except the provenance file
+datasets/*
+!datasets/DATASET_INFO.json
+
+# Training outputs, exported models, downloaded weights
+runs/
+exports/
+weights/
+*.pt
+*.onnx
+
+# Python clutter
+__pycache__/
+*.pyc
+
+# D-FINE side environment
+.venv-dfine/

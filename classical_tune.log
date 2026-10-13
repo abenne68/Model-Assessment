@@ -1,0 +1,2 @@
+best val AP50 0.8176 {'mode': 'columns', 'params': {'thr': 9, 'col_thr': 0.35, 'row_thr': 0.2, 'min_w': 20}}
+{'mode': 'columns', 'params': {'thr': 9, 'col_thr': 0.35, 'row_thr': 0.2, 'min_w': 20}}

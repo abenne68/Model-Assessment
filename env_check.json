@@ -1,0 +1,43 @@
+{
+  "os": "Windows-11-10.0.26200-SP0",
+  "cpu": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD",
+  "python": "3.12.14",
+  "torch": "2.14.0+cpu",
+  "cuda_available": false,
+  "gpu": null,
+  "ultralytics": "8.4.164",
+  "models": {
+    "v5": {
+      "weights": "yolov5nu.pt",
+      "ok": true,
+      "params": 2654816,
+      "head": "Detect",
+      "nms_free": false,
+      "reg_max": 16
+    },
+    "v8": {
+      "weights": "yolov8n.pt",
+      "ok": true,
+      "params": 3157200,
+      "head": "Detect",
+      "nms_free": false,
+      "reg_max": 16
+    },
+    "v11": {
+      "weights": "yolo11n.pt",
+      "ok": true,
+      "params": 2624080,
+      "head": "Detect",
+      "nms_free": false,
+      "reg_max": 16
+    },
+    "v26": {
+      "weights": "yolo26n.pt",
+      "ok": true,
+      "params": 2572280,
+      "head": "Detect",
+      "nms_free": true,
+      "reg_max": 1
+    }
+  }
+}

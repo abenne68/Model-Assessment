@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Camera Stream Hub</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
+<style>
+  :root{--bg:#f6f7f9;--card:#fff;--fg:#1c2330;--mut:#667085;--bd:#dde1e8;--ac:#1f6feb}
+  @media(prefers-color-scheme:dark){:root{--bg:#10141b;--card:#181e28;--fg:#e6e9ef;--mut:#94a0b4;--bd:#2a3342;--ac:#5b9dff}}
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.45 system-ui,sans-serif;background:var(--bg);color:var(--fg)}
+  header{padding:16px;border-bottom:1px solid var(--bd);background:var(--card)}
+  h1{margin:0;font-size:20px} header p{margin:4px 0 0;color:var(--mut)}
+  main{max-width:1200px;margin:0 auto;padding:16px}
+  form{display:grid;grid-template-columns:1fr 2fr 130px auto;gap:8px;margin-bottom:16px}
+  input,select,button{font:inherit;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--card);color:var(--fg)}
+  button{cursor:pointer} button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+  .view{aspect-ratio:16/9;background:#000;display:flex;align-items:center;justify-content:center;color:#aaa}
+  .view video,.view img{width:100%;height:100%;object-fit:contain}
+  .body{padding:10px 12px}
+  .name{font-weight:600}
+  .url{font:12px ui-monospace,monospace;color:var(--mut);word-break:break-all;margin:4px 0 8px}
+  .row{display:flex;gap:6px;flex-wrap:wrap}
+  .row button{font-size:13px;padding:5px 8px}
+  .tag{font-size:11px;border:1px solid var(--bd);border-radius:99px;padding:1px 8px;color:var(--mut);margin-left:6px}
+  .err{color:#d92d20;font-size:12px;margin-top:6px}
+  details{margin-top:24px;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px 16px}
+  pre{background:var(--bg);padding:10px;border-radius:6px;overflow:auto;font-size:13px}
+  @media(max-width:700px){form{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Camera Stream Hub</h1>
+  <p>Preview public camera streams and copy URLs for Ignition (Perspective Video Player / Vision Image).</p>
+</header>
+<main>
+  <form id="add">
+    <input id="n" placeholder="Name" required>
+    <input id="u" placeholder="Stream URL (.m3u8, MJPEG, or JPEG snapshot)" type="url" required>
+    <select id="t"><option value="auto">Auto-detect</option><option value="hls">HLS</option><option value="mjpeg">MJPEG</option><option value="jpeg">JPEG snapshot</option></select>
+    <button class="p">Add</button>
+  </form>
+  <details style="margin:0 0 16px" open>
+    <summary><b>Verified public camera catalog</b> <span id="cnt" style="color:var(--mut)"></span></summary>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+      <select id="reg"></select>
+      <input id="flt" placeholder="Filter (e.g. I-5, Times Sq, Broadway)" style="flex:1;min-width:160px">
+    </div>
+    <div id="found" style="max-height:280px;overflow:auto"></div>
+  </details>
+  <div class="grid" id="grid"></div>
+
+  <details open>
+    <summary><b>Using these in Ignition</b></summary>
+    <p><b>Perspective:</b> add a <i>Video Player</i> component, set <code>props.source</code> to the HLS (<code>.m3u8</code>) URL.
+    Use <i>Copy Perspective binding</i> below for an expression-ready value.</p>
+    <p><b>Vision:</b> MJPEG/JPEG work in an <i>Image</i> component (or a Label with an HTML &lt;img&gt;) via a URL path; for snapshots, refresh with a timer script:</p>
+    <pre>img = system.net.httpGet("SNAPSHOT_URL")  # bytes
+# or set the component's image path to the URL and toggle it on a timer</pre>
+    <p><b>RTSP</b> cameras can't play in a browser; convert to HLS with FFmpeg or go2rtc on the gateway machine.</p>
+    <p><b>CORS:</b> if a preview fails here but plays in VLC, the camera server blocks browser embedding. Ignition's Video Player may still work (it loads from the client), or relay it through your gateway/go2rtc.</p>
+    <p>Only use cameras that are intentionally public, and respect each provider's terms.</p>
+  </details>
+</main>
+<script src="catalog.js"></script>
+<script>
+const KEY='camhub.streams';
+const SEED=[
+  {n:'Apple bip-bop (HLS test pattern)',u:'https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8',t:'hls'},
+  {n:'Mux test stream (HLS)',u:'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',t:'hls'}
+];
+let list;
+try{list=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!Array.isArray(list)) list=SEED.slice();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(list))}catch(e){}};
+const detect=u=>/\.m3u8(\?|$)/i.test(u)?'hls':/\.(jpe?g|png)(\?|$)/i.test(u)?'jpeg':/mjpe?g|\.cgi|video\.|stream/i.test(u)?'mjpeg':'hls';
+const hlsInst=[];
+
+function render(){
+  hlsInst.splice(0).forEach(h=>h.destroy());
+  const g=document.getElementById('grid'); g.innerHTML='';
+  list.forEach((s,i)=>{
+    const type=s.t==='auto'?detect(s.u):s.t;
+    const c=document.createElement('div'); c.className='card';
+    c.innerHTML=`<div class="view"></div><div class="body">
+      <div class="name"></div><div class="url"></div>
+      <div class="row">
+        <button data-a="url">Copy URL</button>
+        <button data-a="ign">Copy Perspective binding</button>
+        <button data-a="open">Open</button>
+        <button data-a="del">Remove</button>
+      </div><div class="err" hidden></div></div>`;
+    c.querySelector('.name').innerHTML='';
+    c.querySelector('.name').textContent=s.n;
+    const tag=document.createElement('span'); tag.className='tag'; tag.textContent=type.toUpperCase(); c.querySelector('.name').append(tag);
+    c.querySelector('.url').textContent=s.u;
+    const view=c.querySelector('.view'), err=c.querySelector('.err');
+    const fail=m=>{err.textContent=m;err.hidden=false};
+    if(type==='hls'){
+      const v=document.createElement('video'); v.controls=true; v.muted=true; v.autoplay=true; v.playsInline=true; view.append(v);
+      if(v.canPlayType('application/vnd.apple.mpegurl')) v.src=s.u;
+      else if(window.Hls&&Hls.isSupported()){
+        const h=new Hls(); hlsInst.push(h); h.loadSource(s.u); h.attachMedia(v);
+        h.on(Hls.Events.ERROR,(_,d)=>{if(d.fatal)fail('Playback failed ('+d.details+'). May be offline or blocked by CORS.')});
+      } else fail('HLS not supported in this browser.');
+    } else {
+      const im=document.createElement('img'); im.alt=s.n; view.append(im);
+      im.onerror=()=>fail('Image failed to load. Offline, or blocked from embedding.');
+      if(type==='jpeg'){const load=()=>{im.src=s.u+(s.u.includes('?')?'&':'?')+'_='+Date.now()}; load(); setInterval(load,5000);}
+      else im.src=s.u;
+    }
+    c.addEventListener('click',e=>{
+      const a=e.target.dataset.a; if(!a)return;
+      if(a==='url')navigator.clipboard.writeText(s.u);
+      if(a==='ign')navigator.clipboard.writeText(JSON.stringify({props:{source:s.u}},null,2));
+      if(a==='open')window.open(s.u,'_blank','noopener');
+      if(a==='del'){list.splice(i,1);save();render()}
+    });
+    g.append(c);
+  });
+}
+document.getElementById('add').addEventListener('submit',e=>{
+  e.preventDefault();
+  list.push({n:n.value.trim(),u:u.value.trim(),t:t.value}); save(); e.target.reset(); render();
+});
+render();
+
+// Bundled catalog (see catalog.js header for verification date)
+const CAT=window.CATALOG||[], reg=document.getElementById('reg');
+const regions=[...new Set(CAT.map(c=>c.r))].sort();
+reg.append(new Option('All regions ('+CAT.length+')',''));
+regions.forEach(r=>reg.append(new Option(r+' ('+CAT.filter(c=>c.r===r).length+')',r)));
+document.getElementById('cnt').textContent=CAT.length+' cameras';
+function showFound(){
+  const q=document.getElementById('flt').value.toLowerCase(), box=document.getElementById('found');
+  box.innerHTML='';
+  const m=CAT.filter(c=>(!reg.value||c.r===reg.value)&&(c.n+' '+c.r).toLowerCase().includes(q));
+  m.slice(0,150).forEach(c=>{
+    const r=document.createElement('div'); r.className='row'; r.style.cssText='align-items:center;padding:3px 0';
+    const b=document.createElement('button'); b.textContent='+ Add'; b.type='button';
+    b.onclick=()=>{list.push({n:c.r+' - '+c.n,u:c.u,t:c.t});save();render();};
+    const s=document.createElement('span'); s.textContent=c.n+'  ('+c.r+', '+(c.t==='hls'?'live video':'snapshot')+')'; r.append(b,s); box.append(r);
+  });
+  if(!m.length) box.textContent='No matches.'; else if(m.length>150) box.append(m.length-150+' more, narrow the filter.');
+}
+document.getElementById('flt').addEventListener('input',showFound);
+reg.addEventListener('change',showFound);
+showFound();
+</script>
+</body>
+</html>

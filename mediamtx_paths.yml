@@ -1,0 +1,28 @@
+# Paste this over the `paths:` section at the bottom of mediamtx.yml, then restart mediamtx.exe.
+#
+# camN      = the raw feed (ffmpeg pulls it and pushes it into MediaMTX)
+# camN_det  = the annotated feed (published by counter.py, nothing to configure)
+#
+# All three feeds below were checked with ffprobe: live, H.264, so -c copy works.
+# -an drops audio (avoids audio-codec problems in RTSP).
+
+paths:
+  cam1:
+    runOnInit: ffmpeg -i https://s67.ipcamlive.com/streams/43ld4hm2abli6ve0z/stream.m3u8 -an -c:v copy -rtsp_transport tcp -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH
+    runOnInitRestart: yes
+
+  cam2:
+    runOnInit: ffmpeg -i https://s33.ipcamlive.com/streams/21ctretyani1mw4dz/stream.m3u8 -an -c:v copy -rtsp_transport tcp -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH
+    runOnInitRestart: yes
+
+  cam3:
+    runOnInit: ffmpeg -i https://s18.us-east-1.skyvdn.com/rtplive/50002/playlist.m3u8 -an -c:v copy -rtsp_transport tcp -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH
+    runOnInitRestart: yes
+
+  # Annotated streams. They must be allowed here, or MediaMTX rejects the publisher.
+  cam1_det:
+  cam2_det:
+  cam3_det:
+
+  # Anything else (kept so ad-hoc paths still work)
+  all_others:

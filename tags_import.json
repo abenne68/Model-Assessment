@@ -1,0 +1,36 @@
+{
+  "name": "default",
+  "tagType": "Provider",
+  "tags": [
+    {
+      "name": "_types_",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "name": "CameraUDT",
+          "tagType": "UdtType",
+          "tags": [
+            { "name": "ObjectCount", "tagType": "AtomicTag", "valueSource": "memory", "dataType": "Int4", "value": 0 },
+            { "name": "CountIn",     "tagType": "AtomicTag", "valueSource": "memory", "dataType": "Int4", "value": 0 },
+            { "name": "CountOut",    "tagType": "AtomicTag", "valueSource": "memory", "dataType": "Int4", "value": 0 },
+            { "name": "Cars",        "tagType": "AtomicTag", "valueSource": "memory", "dataType": "Int4", "value": 0 },
+            { "name": "Trucks",      "tagType": "AtomicTag", "valueSource": "memory", "dataType": "Int4", "value": 0 },
+            { "name": "Buses",       "tagType": "AtomicTag", "valueSource": "memory", "dataType": "Int4", "value": 0 },
+            { "name": "Motorcycles", "tagType": "AtomicTag", "valueSource": "memory", "dataType": "Int4", "value": 0 },
+            { "name": "LastUpdate",  "tagType": "AtomicTag", "valueSource": "memory", "dataType": "DateTime" },
+            { "name": "Online",      "tagType": "AtomicTag", "valueSource": "memory", "dataType": "Boolean", "value": false }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cameras",
+      "tagType": "Folder",
+      "tags": [
+        { "name": "cam1", "tagType": "UdtInstance", "typeId": "CameraUDT" },
+        { "name": "cam2", "tagType": "UdtInstance", "typeId": "CameraUDT" },
+        { "name": "cam3", "tagType": "UdtInstance", "typeId": "CameraUDT" }
+      ]
+    }
+  ]
+}

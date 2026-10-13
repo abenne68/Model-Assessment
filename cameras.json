@@ -1,0 +1,33 @@
+{
+  "ignition_url": "http://localhost:8088/system/webdev/PDA_TRACK/count",
+  "mediamtx_rtsp": "rtsp://localhost:8554",
+  "ffmpeg_path": "C:/Users/austi/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-9.0.2-full_build/bin/ffmpeg.exe",
+  "model": "yolo26n.pt",
+  "conf": 0.25,
+  "imgsz": 960,
+  "process_fps": 8,
+  "post_interval_s": 1,
+  "out_width": 960,
+  "classes": {
+    "2": "Cars",
+    "3": "Motorcycles",
+    "5": "Buses",
+    "7": "Trucks"
+  },
+  "cameras": [
+    {
+      "id": "cam1", "name": "Ocean City Boardwalk 2",
+      "classes": { "0": "People" },
+      "line": [[0.0, 0.6], [1.0, 0.6]]
+    },
+    {
+      "id": "cam2", "name": "Dolles Boardwalk",
+      "classes": { "0": "People" },
+      "line": [[0.0, 0.6], [1.0, 0.6]]
+    },
+    {
+      "id": "cam3", "name": "Myrtle Beach US-501",
+      "line": [[0.0, 0.6], [1.0, 0.6]]
+    }
+  ]
+}

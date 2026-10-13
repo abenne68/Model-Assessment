@@ -1,0 +1,12 @@
+names:
+- bottle
+nc: 1
+roboflow:
+  license: CC BY 4.0
+  project: bottle-detection-conveyor
+  url: https://universe.roboflow.com/tpicbxaiproject/bottle-detection-conveyor/dataset/16
+  version: 16
+  workspace: tpicbxaiproject
+test: ../test/images
+train: ../train/images
+val: ../valid/images
